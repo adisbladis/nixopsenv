@@ -41,7 +41,13 @@ let
     inherit (finalDrv) passthru meta;
   } ''
     mkdir -p $out/bin
-    ln -s ${buildEnvDrv}/bin/nixops $out/bin/nixops
+
+    for bindir in ${lib.concatStringsSep " " (map (d: "${lib.getBin d}/bin") plugins)}; do
+      for bin in $bindir/*; do
+        ln -s ${buildEnvDrv}/bin/$(basename $bin) $out/bin/
+      done
+    done
+
     ln -s ${manEnv} $out/share
   '';
 
